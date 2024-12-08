@@ -1,13 +1,61 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <nav>
-        <router-link to="/">Home</router-link> |
-        <router-link to="/login">Prijavi se</router-link> |
-        <router-link to="/signup">Registriraj se</router-link>
-      </nav>
+    <nav id="nav" class="navbar navbar-expand-lg navbar-light">
+      <!-- kod iz Bootstrapa -->
+
+      <a class="navbar-brand" href="#">
+        <img
+          src="@/assets/logo1.jpg"
+          alt="Logo"
+          height="80"
+          class="d-inline-block align-text-top"
+          loading="lazy"
+        />
+        <!--širinu smo makli da bude automatska-->
+      </a>
+
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarToggler"
+        aria-controls="navbarToggler"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarToggler">
+        <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+          <li class="nav-item">
+            <router-link to="/" class="nav-link">Home</router-link>
+          </li>
+          <li class="nav-item">
+            <router-link to="/login" class="nav-link">Prijavi se</router-link>
+          </li>
+          <li class="nav-item">
+            <router-link to="/signup" class="nav-link"
+              >Registriraj se</router-link
+            >
+          </li>
+          <li class="nav-item">
+            <router-link to="/menu" class="nav-link">Troškovi</router-link>
+          </li>
+        </ul>
+        <form class="form-inline my-2 my-lg-0">
+          <input
+            class="form-control mr-sm-2"
+            type="search"
+            placeholder="Pretraga"
+            aria-label="Search"
+          />
+        </form>
+      </div>
+    </nav>
+
+    <div class="container">
+      <router-view />
     </div>
-    <router-view />
   </div>
 </template>
 
@@ -20,7 +68,7 @@
   color: #2c3e50;
 }
 
-nav {
+#nav {
   padding: 30px;
 
   a {

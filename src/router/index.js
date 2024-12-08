@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 
+
 const routes = [
   {
     path: '/',
@@ -20,8 +21,13 @@ const routes = [
     name: 'signup',
     component: () => import(/* webpackChunkName: "signup" */ '../views/Signup.vue')
   },
-
+{
+    path: '/menu',
+    name: 'menu',
+    component: () => import(/* webpackChunkName: "menu" */ '../views/menu.vue')
+},
 ]
+
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
