@@ -64,7 +64,7 @@ export default {
         alert("Prijava uspješna!");
 
         // Navigacija na Početnu stranicu
-        this.$router.push("/menu");
+        this.$router.replace("/"); //s replace nema povratka na stranicu s koje smo došli
       } catch (error) {
         console.error("Greška:", error.message);
         alert("Došlo je do greške: " + error.message);

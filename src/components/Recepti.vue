@@ -13,7 +13,7 @@
 
 <script>
 export default {
-  name: "Recepti",
+  name: "autotroskovnik",
 };
 </script>
 

@@ -58,6 +58,22 @@
     </div>
   </div>
 </template>
+<script>
+import { auth } from "@/firebase"; // Importajte `auth` iz inicijalizacijske datoteke
+import { onAuthStateChanged } from "firebase/auth";
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    console.log(user.email);
+  } else {
+    console.log("Nema korisnika");
+  }
+});
+
+export default {
+  name: "App",
+};
+</script>
 
 <style lang="scss">
 #app {

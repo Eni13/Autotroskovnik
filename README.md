@@ -1,4 +1,4 @@
-# recepti_1
+# autotroskovnik
 
 ## Project setup
 ```

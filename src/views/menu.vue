@@ -55,7 +55,7 @@
           </ul>
 
           <li>
-            <a class="dropdown-item" href="#" @click.prevent="login"
+            <a class="dropdown-item" href="#" @click.prevent="logout"
               >Odjavi se</a
             >
           </li>
@@ -66,18 +66,15 @@
   </div>
 </template>
 <script>
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/firebase";
+import { auth } from "@/firebase"; // Importajte auth instancu iz vaše inicijalizacijske datoteke
+import { signOut } from "firebase/auth";
 
 export default {
-  name: "signOut",
+  name: "logout",
   methods: {
-    login() {
-      const auth = getAuth();
+    logout() {
       signOut(auth).then(() => {
-        // Uspješna odjava
-        alert("Uspješno ste odjavljeni!");
-        this.$router.push("/login"); // Navigacija na login stranicu
+        this.$router.push("/login");
       });
     },
   },
