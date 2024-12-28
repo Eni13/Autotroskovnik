@@ -5,7 +5,7 @@
 
       <a class="navbar-brand" href="#">
         <img
-          src="@/assets/logo1.jpg"
+          src="@/assets/images.jpeg"
           alt="Logo"
           height="80"
           class="d-inline-block align-text-top"
@@ -38,18 +38,9 @@
               >Registriraj se</router-link
             >
           </li>
-          <li class="nav-item">
-            <router-link to="/menu" class="nav-link">Troškovi</router-link>
-          </li>
         </ul>
-        <form class="form-inline my-2 my-lg-0">
-          <input
-            class="form-control mr-sm-2"
-            type="search"
-            placeholder="Pretraga"
-            aria-label="Search"
-          />
-        </form>
+
+        <a href="#" @click.prevent="logout">Odjavi se</a>
       </div>
     </nav>
 
@@ -61,6 +52,7 @@
 <script>
 import { auth } from "@/firebase"; // Importajte `auth` iz inicijalizacijske datoteke
 import { onAuthStateChanged } from "firebase/auth";
+import { signOut } from "firebase/auth";
 
 onAuthStateChanged(auth, (user) => {
   if (user) {
@@ -72,6 +64,15 @@ onAuthStateChanged(auth, (user) => {
 
 export default {
   name: "App",
+
+  name: "logout",
+  methods: {
+    logout() {
+      signOut(auth).then(() => {
+        this.$router.push("/login");
+      });
+    },
+  },
 };
 </script>
 

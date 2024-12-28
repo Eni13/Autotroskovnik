@@ -4,13 +4,13 @@ import { getFirestore } from "firebase/firestore";
 
 
 const firebaseConfig = {
-    apiKey: "AIzaSyDS0o4SmEUSvzoE9tdb1hR-XLmGclsef6I",
-    authDomain: "recepti-914a4.firebaseapp.com",
-    projectId: "recepti-914a4",
-    storageBucket: "recepti-914a4.firebasestorage.app",
-    messagingSenderId: "634444469273",
-    appId: "1:634444469273:web:ef7850079bd6c014968688"
-  };
+  apiKey: "AIzaSyAm1ah1j1gcsqQnUxpMg3zRXrZBchM7RDg",
+  authDomain: "autotroskovnik.firebaseapp.com",
+  projectId: "autotroskovnik",
+  storageBucket: "autotroskovnik.firebasestorage.app",
+  messagingSenderId: "765965267096",
+  appId: "1:765965267096:web:24d2cda1ad446c221460ed"
+};
   
   //inicijalizacija firebase
   const app = initializeApp(firebaseConfig);

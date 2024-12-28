@@ -22,9 +22,9 @@ const routes = [
     component: () => import(/* webpackChunkName: "signup" */ '../views/Signup.vue')
   },
 {
-    path: '/menu',
-    name: 'menu',
-    component: () => import(/* webpackChunkName: "menu" */ '../views/menu.vue')
+  path: '/troskovi',
+  name: 'troskovi',
+  component: () => import(/* webpackChunkName: "menu" */ '../views/dodajtrosak.vue')
 },
 ]
 
