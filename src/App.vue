@@ -30,47 +30,78 @@
           <li class="nav-item">
             <router-link to="/" class="nav-link">Home</router-link>
           </li>
-          <li class="nav-item">
+          <li v-if="!authenticated" class="nav-item">
             <router-link to="/login" class="nav-link">Prijavi se</router-link>
           </li>
-          <li class="nav-item">
+          <li v-if="!authenticated" class="nav-item">
             <router-link to="/signup" class="nav-link"
               >Registriraj se</router-link
             >
           </li>
-        </ul>
 
-        <a href="#" @click.prevent="logout">Odjavi se</a>
+          <li v-if="authenticated" class="nav-item">
+            <a href="#" @click.prevent="logout()" class="nav-link">Odjavi se</a>
+          </li>
+        </ul>
       </div>
     </nav>
-
     <div class="container">
       <router-view />
     </div>
   </div>
 </template>
 <script>
-import { auth } from "@/firebase"; // Importajte `auth` iz inicijalizacijske datoteke
-import { onAuthStateChanged } from "firebase/auth";
-import { signOut } from "firebase/auth";
-
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    console.log(user.email);
-  } else {
-    console.log("Nema korisnika");
-  }
-});
+import { auth, firestore } from "@/firebase"; // Importajte `auth` iz inicijalizacijske datoteke
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import router from "@/router";
 
 export default {
   name: "App",
-
-  name: "logout",
+  data() {
+    return {
+      authenticated: false, // Status korisnika
+      userData: null, // Podaci o korisniku iz Firestore-a
+    };
+  },
+  mounted() {
+    this.checkUser(); // provjera korisnika
+  },
   methods: {
-    logout() {
-      signOut(auth).then(() => {
-        this.$router.push("/login");
+    async checkUser() {
+      onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          this.authenticated = true; // Korisnik je prijavljen
+          console.log("Korisnik prijavljen:", user.email);
+
+          try {
+            // Referenciraj dokument u kolekciji `autoTroskovnik`
+            const docRef = doc(firestore, "autoTroskovnik", user.email);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+              this.userData = docSnap.data(); // Postavljamo podatke
+              console.log("Podaci korisnika:", this.userData);
+            }
+          } catch (error) {
+            //console.error("Pogreška", error);
+          }
+        } else {
+          this.authenticated = false; // Korisnik nije prijavljen
+          console.log("Korisnik nije prijavljen.");
+        }
       });
+    },
+    logout() {
+      signOut(auth)
+        .then(() => {
+          this.authenticated = false;
+          this.userData = null;
+          router.push("/login");
+        })
+        .catch((error) => {
+          //console.error("Pogreška pri odjavi:", error);
+        });
     },
   },
 };
@@ -83,6 +114,7 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  background-color: lightblue;
 }
 
 #nav {

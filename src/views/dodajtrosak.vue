@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-    <!-- Dodavanje troška -->
     <h2>Dodaj Trošak</h2>
     <form @submit.prevent="dodajTrosak">
       <div class="mb-3">
@@ -42,7 +41,6 @@
       <button type="submit" class="btn btn-primary">Dodaj</button>
     </form>
 
-    <!-- Popis svih troškova -->
     <h3 class="mt-5">Popis Troškova</h3>
     <ul class="list-group">
       <li
@@ -68,46 +66,94 @@
       </li>
     </ul>
 
-    <!-- Modal za uređivanje troška -->
-    <div v-if="urediTrosakModal" class="modal">
+    <!-- Gumbi za otvaranje modala -->
+    <div class="mt-4">
+      <button class="btn btn-info" @click="otvoriModal('mjesečni')">
+        Mjesečni troškovi
+      </button>
+      <button class="btn btn-info" @click="otvoriModal('godišnji')">
+        Godišnji troškovi
+      </button>
+    </div>
+
+    <!-- Modal za mjesečne troškove -->
+    <div v-if="modalMjesečni" class="modal">
       <div class="modal-content">
-        <h4>Uredi Trošak</h4>
-        <div class="mb-3">
-          <label for="editNaziv" class="form-label">Naziv troška</label>
-          <input
-            type="text"
-            id="editNaziv"
-            v-model="urediTrosakPodaci.naziv"
-            class="form-control"
-            required
-          />
+        <h4>Mjesečni Troškovi</h4>
+        <div class="form-group mb-3">
+          <label for="mjesec">Odaberite Mjesec:</label>
+          <select v-model="selectedMjesec" class="form-control" id="mjesec">
+            <option
+              v-for="(month, index) in months"
+              :key="index"
+              :value="index"
+            >
+              {{ month }}
+            </option>
+          </select>
         </div>
 
-        <div class="mb-3">
-          <label for="editIznos" class="form-label">Iznos</label>
+        <div class="form-group mb-3">
+          <label for="godina">Unesite Godinu:</label>
           <input
             type="number"
-            id="editIznos"
-            v-model="urediTrosakPodaci.iznos"
+            id="godina"
+            v-model="selectedGodina"
             class="form-control"
-            step="0.01"
+            placeholder="Unesite godinu"
             required
           />
         </div>
 
-        <div class="mb-3">
-          <label for="editDatum" class="form-label">Datum</label>
+        <h5>{{ odabraniMjesecGodina }}</h5>
+        <ul class="list-group">
+          <li
+            class="list-group-item d-flex justify-content-between align-items-center"
+            v-for="(trosak, index) in filtriraniTroskovi"
+            :key="index"
+          >
+            <span>{{ trosak.naziv }} - {{ trosak.iznos.toFixed(2) }} EUR</span>
+          </li>
+        </ul>
+        <h5 class="mt-3">
+          Ukupni troškovi: {{ ukupniMjesečni.toFixed(2) }} EUR
+        </h5>
+        <button class="btn btn-secondary mt-3" @click="zatvoriModal">
+          Zatvori
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal za godišnje troškove -->
+    <div v-if="modalGodišnji" class="modal">
+      <div class="modal-content">
+        <h4>Godišnji Troškovi</h4>
+        <div class="form-group mb-3">
+          <label for="godina">Unesite Godinu:</label>
           <input
-            type="date"
-            id="editDatum"
-            v-model="urediTrosakPodaci.datum"
+            type="number"
+            id="godina"
+            v-model="selectedGodina"
             class="form-control"
+            placeholder="Unesite godinu"
             required
           />
         </div>
 
-        <button class="btn btn-primary" @click="spremiPromjene">Spremi</button>
-        <button class="btn btn-secondary" @click="zatvoriUrediModal">
+        <h5>{{ selectedGodina }} Godina</h5>
+        <ul class="list-group">
+          <li
+            class="list-group-item d-flex justify-content-between align-items-center"
+            v-for="(trosak, index) in filtriraniTroskoviGodina"
+            :key="index"
+          >
+            <span>{{ trosak.naziv }} - {{ trosak.iznos.toFixed(2) }} EUR</span>
+          </li>
+        </ul>
+        <h5 class="mt-3">
+          Ukupni troškovi: {{ ukupniGodišnji.toFixed(2) }} EUR
+        </h5>
+        <button class="btn btn-secondary mt-3" @click="zatvoriModal">
           Zatvori
         </button>
       </div>
@@ -116,6 +162,7 @@
 </template>
 
 <script>
+import { getAuth } from "firebase/auth";
 import { db } from "@/firebase";
 import {
   collection,
@@ -143,7 +190,59 @@ export default {
         iznos: "",
         datum: "",
       },
+      selectedMjesec: new Date().getMonth(),
+      selectedGodina: new Date().getFullYear(),
+      months: [
+        "Siječanj",
+        "Veljača",
+        "Ožujak",
+        "Travanj",
+        "Svibanj",
+        "Lipanj",
+        "Srpanj",
+        "Kolovoz",
+        "Rujan",
+        "Listopad",
+        "Studeni",
+        "Prosinac",
+      ],
+      modalMjesečni: false,
+      modalGodišnji: false,
     };
+  },
+  computed: {
+    odabraniMjesecGodina() {
+      const mjesec = this.months[this.selectedMjesec];
+      const godina = this.selectedGodina;
+      return `${mjesec} ${godina}`;
+    },
+    filtriraniTroskovi() {
+      return this.troskovi.filter((trosak) => {
+        const datum = new Date(trosak.datum);
+        const mjesec = datum.getMonth();
+        const godina = datum.getFullYear();
+        return mjesec === this.selectedMjesec && godina === this.selectedGodina;
+      });
+    },
+    filtriraniTroskoviGodina() {
+      return this.troskovi.filter((trosak) => {
+        const datum = new Date(trosak.datum);
+        const godina = datum.getFullYear();
+        return godina === this.selectedGodina;
+      });
+    },
+    ukupniMjesečni() {
+      return this.filtriraniTroskovi.reduce(
+        (sum, trosak) => sum + trosak.iznos,
+        0
+      );
+    },
+    ukupniGodišnji() {
+      return this.filtriraniTroskoviGodina.reduce(
+        (sum, trosak) => sum + trosak.iznos,
+        0
+      );
+    },
   },
   methods: {
     async dodajTrosak() {
@@ -153,15 +252,26 @@ export default {
           !this.noviTrosak.iznos ||
           !this.noviTrosak.datum
         ) {
-          alert("Molimo ispunite sve podatke!");
+          alert("Potrebno je ispuniti sve podatke!");
           return;
         }
+
+        const auth = getAuth();
+        const user = auth.currentUser;
+
+        if (!user) {
+          alert("Morate biti prijavljeni kako biste dodali trošak.");
+          return;
+        }
+
+        const userEmail = user.email;
 
         const docRef = await addDoc(collection(db, "troskovi"), {
           naziv: this.noviTrosak.naziv,
           iznos: parseFloat(this.noviTrosak.iznos),
           datum: this.noviTrosak.datum,
           createdAt: serverTimestamp(),
+          korisnikEmail: userEmail,
         });
 
         this.troskovi.push({
@@ -169,6 +279,7 @@ export default {
           naziv: this.noviTrosak.naziv,
           iznos: parseFloat(this.noviTrosak.iznos),
           datum: this.noviTrosak.datum,
+          korisnikEmail: userEmail,
         });
 
         this.noviTrosak = { naziv: "", iznos: "", datum: "" };
@@ -179,12 +290,48 @@ export default {
     async dohvatiTroskove() {
       try {
         const querySnapshot = await getDocs(collection(db, "troskovi"));
-        this.troskovi = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+        const auth = getAuth();
+        const user = auth.currentUser;
+
+        if (!user) {
+          alert("Morate biti prijavljeni kako biste vidjeli troškove.");
+          return;
+        }
+
+        const userEmail = user.email;
+
+        this.troskovi = querySnapshot.docs
+          .map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }))
+          .filter((trosak) => trosak.korisnikEmail === userEmail);
       } catch (error) {
         console.error("Greška prilikom dohvaćanja troškova:", error);
+      }
+    },
+    prikaziUrediTrosak(trosak) {
+      this.urediTrosakModal = true;
+      this.urediTrosakPodaci = { ...trosak };
+    },
+    async spremiIzmjeneTroska() {
+      try {
+        const docRef = doc(db, "troskovi", this.urediTrosakPodaci.id);
+        await updateDoc(docRef, {
+          naziv: this.urediTrosakPodaci.naziv,
+          iznos: parseFloat(this.urediTrosakPodaci.iznos),
+          datum: this.urediTrosakPodaci.datum,
+        });
+        const index = this.troskovi.findIndex(
+          (trosak) => trosak.id === this.urediTrosakPodaci.id
+        );
+        if (index !== -1) {
+          this.troskovi.splice(index, 1, this.urediTrosakPodaci);
+        }
+        this.urediTrosakModal = false;
+        this.urediTrosakPodaci = { id: null, naziv: "", iznos: "", datum: "" };
+      } catch (error) {
+        console.error("Greška prilikom spremanja izmjena:", error);
       }
     },
     async ukloniTrosak(id) {
@@ -195,34 +342,16 @@ export default {
         console.error("Greška prilikom brisanja troška:", error);
       }
     },
-    prikaziUrediTrosak(trosak) {
-      this.urediTrosakPodaci = { ...trosak };
-      this.urediTrosakModal = true;
+    zatvoriModal() {
+      this.modalMjesečni = false;
+      this.modalGodišnji = false;
     },
-    async spremiPromjene() {
-      try {
-        const trosakRef = doc(db, "troskovi", this.urediTrosakPodaci.id);
-        await updateDoc(trosakRef, {
-          naziv: this.urediTrosakPodaci.naziv,
-          iznos: parseFloat(this.urediTrosakPodaci.iznos),
-          datum: this.urediTrosakPodaci.datum,
-        });
-
-        const index = this.troskovi.findIndex(
-          (trosak) => trosak.id === this.urediTrosakPodaci.id
-        );
-        if (index !== -1) {
-          this.troskovi[index] = { ...this.urediTrosakPodaci };
-        }
-
-        this.zatvoriUrediModal();
-      } catch (error) {
-        console.error("Greška prilikom spremanja promjena:", error);
+    otvoriModal(tip) {
+      if (tip === "mjesečni") {
+        this.modalMjesečni = true;
+      } else {
+        this.modalGodišnji = true;
       }
-    },
-    zatvoriUrediModal() {
-      this.urediTrosakPodaci = { id: null, naziv: "", iznos: "", datum: "" };
-      this.urediTrosakModal = false;
     },
   },
   mounted() {
@@ -231,36 +360,25 @@ export default {
 };
 </script>
 
-<style>
-.container {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
+<style scoped>
 .modal {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  right: 0;
+  bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
 .modal-content {
-  background-color: #fff;
+  background-color: white;
   padding: 20px;
   border-radius: 8px;
-  width: 500px;
-}
-
-.btn-sm {
-  padding: 0.25rem 0.5rem;
-}
-
-.form-control {
-  max-width: 100%;
+  max-width: 500px;
+  width: 100%;
 }
 </style>

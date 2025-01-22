@@ -16,9 +16,7 @@
                 aria-describedby="emailHelp"
                 placeholder="Unesi e-mail"
               />
-              <small id="emailHelp" class="form-text text-muted">
-                E-mail se neće dijeliti s drugima
-              </small>
+              <small id="emailHelp" class="form-text text-muted"> </small>
             </div>
             <div class="form-group">
               <label for="password">Lozinka</label>
@@ -40,6 +38,7 @@
                 placeholder="Potvrdi lozinku"
               />
             </div>
+            Mora biti 6 ili više znakova
             <button type="button" @click="signup" class="btn btn-primary mt-5">
               Potvrdi
             </button>
