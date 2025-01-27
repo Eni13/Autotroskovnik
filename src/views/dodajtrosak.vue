@@ -49,13 +49,15 @@
         :key="index"
       >
         <span>{{ trosak.naziv }} - {{ trosak.iznos.toFixed(2) }} EUR</span>
+
         <div>
           <button
-            class="btn btn-warning btn-sm me-2"
+            class="btn btn-warning btn-sm"
             @click="prikaziUrediTrosak(trosak)"
           >
             Uredi
           </button>
+
           <button
             class="btn btn-danger btn-sm"
             @click="ukloniTrosak(trosak.id)"
@@ -74,6 +76,77 @@
       <button class="btn btn-info" @click="otvoriModal('godišnji')">
         Godišnji troškovi
       </button>
+    </div>
+
+    <!-- Modal za uređivanje troska -->
+    <div
+      v-if="urediTrosakModal"
+      class="modal d-block"
+      tabindex="-1"
+      role="dialog"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Uredi Trošak</h5>
+            <button
+              type="button"
+              class="btn-close"
+              aria-label="Close"
+              @click="urediTrosakModal = false"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="mb-3">
+                <label for="naziv" class="form-label">Naziv troška</label>
+                <input
+                  v-model="urediTrosakPodaci.naziv"
+                  type="text"
+                  class="form-control"
+                  id="naziv"
+                  placeholder="Unesite naziv troška"
+                />
+              </div>
+              <div class="mb-3">
+                <label for="iznos" class="form-label">Iznos</label>
+                <input
+                  v-model="urediTrosakPodaci.iznos"
+                  type="number"
+                  class="form-control"
+                  id="iznos"
+                  placeholder="Unesite iznos"
+                />
+              </div>
+              <div class="mb-3">
+                <label for="datum" class="form-label">Datum</label>
+                <input
+                  v-model="urediTrosakPodaci.datum"
+                  type="date"
+                  class="form-control"
+                  id="datum"
+                />
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              @click="urediTrosakModal = false"
+            >
+              Zatvori
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              @click="spremiIzmjeneTroska"
+            >
+              Spremi izmjene
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Modal za mjesečne troškove -->
@@ -269,7 +342,7 @@ export default {
         const docRef = await addDoc(collection(db, "troskovi"), {
           naziv: this.noviTrosak.naziv,
           iznos: parseFloat(this.noviTrosak.iznos),
-          datum: this.noviTrosak.datum,
+          datum: this.noviTrosak.datum, // Pobrinite se da je datum u ispravnom formatu
           createdAt: serverTimestamp(),
           korisnikEmail: userEmail,
         });
@@ -314,26 +387,47 @@ export default {
       this.urediTrosakModal = true;
       this.urediTrosakPodaci = { ...trosak };
     },
+
     async spremiIzmjeneTroska() {
       try {
+        // Validacija podataka
+        if (
+          !this.urediTrosakPodaci.naziv ||
+          isNaN(parseFloat(this.urediTrosakPodaci.iznos)) ||
+          !this.urediTrosakPodaci.datum
+        ) {
+          throw new Error("Molimo popunite sva polja ispravno!");
+        }
+
+        // Priprema ažuriranja
         const docRef = doc(db, "troskovi", this.urediTrosakPodaci.id);
+        if (!docRef) {
+          throw new Error("Nije moguće pronaći dokument s navedenim ID-om.");
+        }
+
+        // Ažuriranje u bazi
         await updateDoc(docRef, {
           naziv: this.urediTrosakPodaci.naziv,
           iznos: parseFloat(this.urediTrosakPodaci.iznos),
           datum: this.urediTrosakPodaci.datum,
         });
+
+        // Ažuriranje u lokalnom nizu
         const index = this.troskovi.findIndex(
           (trosak) => trosak.id === this.urediTrosakPodaci.id
         );
         if (index !== -1) {
-          this.troskovi.splice(index, 1, this.urediTrosakPodaci);
+          this.troskovi.splice(index, 1, { ...this.urediTrosakPodaci });
         }
+
+        // Resetiranje podataka i zatvaranje modala
         this.urediTrosakModal = false;
         this.urediTrosakPodaci = { id: null, naziv: "", iznos: "", datum: "" };
       } catch (error) {
         console.error("Greška prilikom spremanja izmjena:", error);
       }
     },
+
     async ukloniTrosak(id) {
       try {
         await deleteDoc(doc(db, "troskovi", id));
@@ -342,6 +436,12 @@ export default {
         console.error("Greška prilikom brisanja troška:", error);
       }
     },
+
+    zatvoriModal() {
+      this.urediTrosakModal = false;
+      this.urediTrosakPodaci = { id: null, naziv: "", iznos: "", datum: "" };
+    },
+
     zatvoriModal() {
       this.modalMjesečni = false;
       this.modalGodišnji = false;
@@ -362,7 +462,7 @@ export default {
 
 <style scoped>
 .modal {
-  position: fixed;
+  position: fixed !important;
   top: 0;
   left: 0;
   right: 0;
