@@ -37,16 +37,5 @@ const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
 });
-//router.beforeEach((to, from, next) => {
-  //console.log('stara ruta', from.name, '->', to.name, 'korisnik', store.currentUser);
-  
- // const noUser = store.currentUser == '';
-
-   // if (noUser && to.meta.needsUser) {
-      //  next('login');
-   // } else {
-      //  next();
-    //}
-//});
 
 export default router;

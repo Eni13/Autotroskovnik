@@ -115,6 +115,7 @@ export default {
   text-align: center;
   color: #2c3e50;
   background-color: lightblue;
+  padding-bottom: 100px;
 }
 
 #nav {

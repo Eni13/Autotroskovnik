@@ -5,20 +5,15 @@
       Ako želite voditi svoje troškove vezano za vaš automobil, kliknite na
       <router-link to="/troskovi">
         <button class="btn">Dodaj trošak</button>
+        <p></p>
       </router-link>
     </p>
   </div>
 </template>
 
-<script>
-// @ is an alias to /src
-</script>
+<script></script>
 
 <style>
-.pocetna {
-  background-color: li;
-}
-
 .btn {
   background-color: #c2fbd7;
   border-radius: 100px;
