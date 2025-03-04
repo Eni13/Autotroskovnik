@@ -149,7 +149,7 @@
       </div>
     </div>
 
-    <!-- Modal za mjesečne troškove -->
+    <!-- prozor za mjesečne troškove -->
     <div v-if="modalMjesečni" class="modal">
       <div class="modal-content">
         <h4>Mjesečni Troškovi</h4>
@@ -197,7 +197,7 @@
       </div>
     </div>
 
-    <!-- Modal za godišnje troškove -->
+    <!-- prozor za godišnje troškove -->
     <div v-if="modalGodišnji" class="modal">
       <div class="modal-content">
         <h4>Godišnji Troškovi</h4>
