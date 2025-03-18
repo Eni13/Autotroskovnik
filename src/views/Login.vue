@@ -67,7 +67,7 @@ export default {
         this.$router.replace("/"); //s replace nema povratka na stranicu s koje smo došli
       } catch (error) {
         console.error("Greška:", error.message);
-        alert("Došlo je do greške: " + error.message);
+        alert("Došlo je do greške, kriva lozinka: " + error.message);
       }
     },
   },

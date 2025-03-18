@@ -50,8 +50,9 @@
     </div>
   </div>
 </template>
+
 <script>
-import { auth, firestore } from "@/firebase";
+import { auth, db } from "@/firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import router from "@/router";
@@ -76,7 +77,7 @@ export default {
 
           try {
             // pozovi dokument u kolekciji `autoTroskovnik`
-            const docRef = doc(firestore, "autoTroskovnik", user.email);
+            const docRef = doc(db, "autoTroskovnik", user.email);
             const docSnap = await getDoc(docRef); //dohvaćanje dokumenta iz firestora koristeći referecu
 
             if (docSnap.exists()) {
