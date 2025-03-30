@@ -80,20 +80,19 @@ export default {
       if (this.password !== this.passwordRepeat) {
         alert("Lozinke se ne podudaraju");
       }
-      if (this.password <= 6) {
-        alert("Lozinka mora imati šest ili više slova");
+      if (this.password.length < 6) {
+        alert("Lozinka mora imati najmanje šest znakova");
       }
 
       try {
         const userCredential = await createUserWithEmailAndPassword(
           auth,
           this.email,
-          this.password,
-          this.passwordRepeat
-        ).then(() => {
-          alert("Uspješna registracija");
-          this.$router.push("/login");
-        });
+          this.password
+        );
+        console.log("Registracija uspješna:", userCredential.user);
+        alert("Uspješna registracija!");
+        this.$router.push("/login");
       } catch (error) {
         console.error("Greška prilikom registracije:", error.message);
         alert("Greška: " + error.message);

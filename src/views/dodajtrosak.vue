@@ -89,12 +89,12 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Uredi Trošak</h5>
-            <button
+            <!-- <button
               type="button"
               class="btn-close"
               aria-label="Close"
               @click="urediTrosakModal = false"
-            ></button>
+            ></button>  -->
           </div>
           <div class="modal-body">
             <form>
@@ -290,6 +290,7 @@ export default {
       return `${mjesec} ${godina}`;
     },
     filtriraniTroskovi() {
+      // troskovi za mjesec
       return this.troskovi.filter((trosak) => {
         const datum = new Date(trosak.datum);
         const mjesec = datum.getMonth();
@@ -298,6 +299,7 @@ export default {
       });
     },
     filtriraniTroskoviGodina() {
+      //troskovi za godinu
       return this.troskovi.filter((trosak) => {
         const datum = new Date(trosak.datum);
         const godina = datum.getFullYear();
@@ -342,7 +344,7 @@ export default {
         const docRef = await addDoc(collection(db, "troskovi"), {
           naziv: this.noviTrosak.naziv,
           iznos: parseFloat(this.noviTrosak.iznos),
-          datum: this.noviTrosak.datum, // Pobrinite se da je datum u ispravnom formatu
+          datum: this.noviTrosak.datum,
           createdAt: serverTimestamp(),
           korisnikEmail: userEmail,
         });
@@ -429,6 +431,7 @@ export default {
     },
 
     async ukloniTrosak(id) {
+      //briše trošak
       try {
         await deleteDoc(doc(db, "troskovi", id));
         this.troskovi = this.troskovi.filter((trosak) => trosak.id !== id);

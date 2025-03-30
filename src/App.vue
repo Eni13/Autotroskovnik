@@ -76,8 +76,8 @@ export default {
           console.log("Korisnik prijavljen:", user.email);
 
           try {
-            // pozovi dokument u kolekciji `autoTroskovnik`
-            const docRef = doc(db, "autoTroskovnik", user.email);
+            // pozovi dokument u kolekciji troskovi
+            const docRef = doc(db, "troskovi", user.email); //kreiranje reference
             const docSnap = await getDoc(docRef); //dohvaćanje dokumenta iz firestora koristeći referecu
 
             if (docSnap.exists()) {
@@ -93,6 +93,7 @@ export default {
         }
       });
     },
+
     logout() {
       signOut(auth)
         .then(() => {
