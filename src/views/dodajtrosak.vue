@@ -89,12 +89,6 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Uredi Trošak</h5>
-            <!-- <button
-              type="button"
-              class="btn-close"
-              aria-label="Close"
-              @click="urediTrosakModal = false"
-            ></button>  -->
           </div>
           <div class="modal-body">
             <form>
@@ -295,6 +289,9 @@ export default {
         const datum = new Date(trosak.datum);
         const mjesec = datum.getMonth();
         const godina = datum.getFullYear();
+        /*  console.log(
+          `Provjera: datum: ${datum}, mjesec: ${mjesec}, godina: ${godina}`
+        ); */
         return mjesec === this.selectedMjesec && godina === this.selectedGodina;
       });
     },
@@ -354,7 +351,6 @@ export default {
           naziv: this.noviTrosak.naziv,
           iznos: parseFloat(this.noviTrosak.iznos),
           datum: this.noviTrosak.datum,
-          korisnikEmail: userEmail,
         });
 
         this.noviTrosak = { naziv: "", iznos: "", datum: "" };
@@ -380,6 +376,7 @@ export default {
             id: doc.id,
             ...doc.data(),
           }))
+
           .filter((trosak) => trosak.korisnikEmail === userEmail);
       } catch (error) {
         console.error("Greška prilikom dohvaćanja troškova:", error);
@@ -431,10 +428,18 @@ export default {
     },
 
     async ukloniTrosak(id) {
-      //briše trošak
       try {
+        const trošakZaBrisanje = this.troskovi.find(
+          (trosak) => trosak.id === id
+        );
+
+        if (!trošakZaBrisanje) {
+          console.log("Odabrani trošak nije pronađen.");
+          return;
+        }
         await deleteDoc(doc(db, "troskovi", id));
         this.troskovi = this.troskovi.filter((trosak) => trosak.id !== id);
+        console.log("Trošak izbrisan", trošakZaBrisanje);
       } catch (error) {
         console.error("Greška prilikom brisanja troška:", error);
       }
